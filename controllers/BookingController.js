@@ -192,5 +192,22 @@ const deleteBooking = async (req, res) => {
     }
 };
 
+const getDayBookings = async (req, res) => {
+    try {
 
-module.exports ={addBooking,getFreeRooms,getConflicts,getConflictsReq,getBookings,editBooking,deleteBooking}
+        const bookings = await Booking.findAll({
+            where: {
+                userId: req.body.userId,
+                startDate: req.body.startDate
+            }
+        });
+
+        res.status(200).json({ bookings: bookings });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: "Server Error!" });
+    }
+};
+
+
+module.exports ={addBooking,getDayBookings,getFreeRooms,getConflicts,getConflictsReq,getBookings,editBooking,deleteBooking}

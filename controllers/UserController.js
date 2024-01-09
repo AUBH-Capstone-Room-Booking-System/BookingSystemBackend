@@ -30,7 +30,9 @@ const editUser=async(req,res)=>{
         user.email=req.body.email;
         user.phoneNumber=req.body.phoneNumber;
         await user.save()
+        res.status(200).json({message:"updated successfully",user:user})
     } catch (error) {
+        console.log(error);
         res.status(500).json({message:"Server error!"})
 
     }

@@ -38,4 +38,22 @@ const editUser=async(req,res)=>{
     }
 }
 
-module.exports={login,editUser}
+const resetPassword=async(req,res)=>{
+    try {
+        const user=await User.findOne({where:{
+            email:req.body.email,
+        }})
+        if(!user){
+            res.status(404).json({message:"Email doesn't exist"})
+        }
+
+        user.password=req.body.password;
+        await user.save()
+        res.status(200).json({message:"updated successfully",user:user})
+    } catch (error) {
+        res.status(500).json({message:"Server error!"})
+
+    }
+}
+
+module.exports={login,editUser,resetPassword}

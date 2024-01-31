@@ -24,6 +24,9 @@ const User = sequelize.define("users", {
     password:{
         type: DataTypes.STRING,
     },
+    major:{
+        type:DataTypes.STRING
+    }
 }, { timestamps: false, } // Add this to disable the default timestamps
 );
 module.exports = User;

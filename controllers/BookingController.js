@@ -5,13 +5,18 @@ const { Op } = require('sequelize');
 
 const addBooking = async (req, res) => {
     try {
+        const guest=User.findOne({
+            userId:req.body.userId,
+        })
+        const fullName=guest.firstName+" "+guest.lastName;
         const booking =new Booking({
             startDate:req.body.startDate,
             startTime:req.body.startTime,
             endTime:req.body.endTime,
             roomNumber:req.body.roomNumber,
             purpose:req.body.purpose,
-            userId:req.body.userId
+            userId:req.body.userId,
+            guest:fullName
         })
         await booking.save()
         res.status(200).json({ booking: booking,message:"Added" });
@@ -157,10 +162,11 @@ const getBookings=async(req,res)=>{
 
 const editBooking=async(req,res)=>{
     try {
-        const prevRoomNumber=req.params.id
+        const prevBookingId=req.params.id
         var booking=await Booking.findOne({where:{
-            id:prevRoomNumber
+            id:prevBookingId
         }})
+        console.log(booking);
         booking.roomNumber=req.body.roomNumber
         await booking.save()
         res.status(200).json({message:"Saved booking",booking:booking})

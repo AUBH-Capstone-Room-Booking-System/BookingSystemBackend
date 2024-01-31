@@ -1,10 +1,14 @@
 const express=require("express")
-const { login, editUser, resetPassword } = require("../controllers/UserController")
+const { login, editUser, resetPassword, createUser, editUserAdmin, getAllUsers, deleteUser } = require("../controllers/UserController")
 
-const roomRouter=express.Router()
+const userRouter=express.Router()
 
-roomRouter.post("/login",login)
-roomRouter.post("/edit/:id",editUser)
-roomRouter.post("/reset",resetPassword)
+userRouter.post("/login",login)
+userRouter.post("/edit/:id",editUser)
+userRouter.post("/reset",resetPassword)
+userRouter.post("/admin/add",createUser)
+userRouter.post("/admin/edit/:id",editUserAdmin)
+userRouter.get("/admin/findall",getAllUsers)
+userRouter.delete("/admin/delete/:id",deleteUser)
 
-module.exports=roomRouter
+module.exports=userRouter

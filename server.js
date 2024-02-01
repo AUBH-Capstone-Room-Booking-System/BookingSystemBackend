@@ -31,8 +31,10 @@ app.use("/sensor", sensorRouter);
 const favoriteRouter = require("./routes/favoriteRoutes");
 app.use("/favorite", favoriteRouter);
 
+const notificationRouter = require("./routes/NotificationRoutes");
+app.use("/notification", notificationRouter);
+
 app.get("/*", function(req, res){
-    console.log(`${__dirname}/../client/build/index.html`)
 
     res.sendFile(
         path.join(__dirname, "../client/build/index.html"),

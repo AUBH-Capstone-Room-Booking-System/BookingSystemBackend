@@ -21,6 +21,9 @@ const Sensor = sequelize.define("Sensors", {
     humidity:{
         type: DataTypes.STRING,
     },
+    comfort:{
+        type: DataTypes.INTEGER,
+    },
   
 
 }, { timestamps: false, } // Add this to disable the default timestamps

@@ -53,6 +53,8 @@ const findAllFavorites=async(req,res)=>{
     }
 }
 
+
+
 const findOneFavorites=async(req,res)=>{
     try {
         const {userId,roomNumber}=req.body
@@ -67,5 +69,6 @@ const findOneFavorites=async(req,res)=>{
 
     }
 }
+
 
 module.exports ={findOneFavorites,findAllFavorites,deleteFromFavorite,addRoomToFavorite}

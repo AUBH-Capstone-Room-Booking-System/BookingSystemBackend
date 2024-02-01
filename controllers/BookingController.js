@@ -2,33 +2,43 @@ const { sequelize } = require("../configuration/connectDb");
 const Booking = require("../models/Booking");
 const Room = require("../models/Room");
 const { Op } = require('sequelize');
+const User = require("../models/User");
+const Notification = require("../models/Notification");
+
 
 const addBooking = async (req, res) => {
     try {
-        const guest=User.findOne({
-            userId:req.body.userId,
+        const guest = await User.findOne({
+            userId: req.body.userId,
         })
-        const fullName=guest.firstName+" "+guest.lastName;
-        const booking =new Booking({
-            startDate:req.body.startDate,
-            startTime:req.body.startTime,
-            endTime:req.body.endTime,
-            roomNumber:req.body.roomNumber,
-            purpose:req.body.purpose,
-            userId:req.body.userId,
-            guest:fullName
+        const fullName = guest.firstName + " " + guest.lastName;
+        const emailCode=guest.email.split("@")[0]
+
+        const notification = new Notification({
+            content: `${fullName} (${emailCode}) booked room ${req.body.roomNumber} (${req.body.startTime} - ${req.body.endTime})`,
+            status: false
+        })
+        await notification.save();
+        const booking = new Booking({
+            startDate: req.body.startDate,
+            startTime: req.body.startTime,
+            endTime: req.body.endTime,
+            roomNumber: req.body.roomNumber,
+            purpose: req.body.purpose,
+            userId: req.body.userId,
+            guest: fullName
         })
         await booking.save()
-        res.status(200).json({ booking: booking,message:"Added" });
+        res.status(200).json({ booking: booking, message: "Added" });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Server error!" });
     }
 }
 
-const getConflictsReq = async (req,res) => {
+const getConflictsReq = async (req, res) => {
     try {
-        const { startDate, startTime, endTime,roomNumber } = req.body;
+        const { startDate, startTime, endTime, roomNumber } = req.body;
 
         const parseTime = (timeString) => {
             const [hours, minutes] = timeString.split(':');
@@ -76,7 +86,7 @@ const getConflictsReq = async (req,res) => {
 
 const getConflicts = async (startDate, startTime, endTime, roomNumber) => {
     try {
-    
+
         const parseTime = (timeString) => {
             const [hours, minutes] = timeString.split(':');
             return { hours: parseInt(hours), minutes: parseInt(minutes) };
@@ -113,9 +123,9 @@ const getConflicts = async (startDate, startTime, endTime, roomNumber) => {
             type: sequelize.QueryTypes.SELECT
         });
         console.log(conflictingBookings.length);
-        if(conflictingBookings.length>=1){
+        if (conflictingBookings.length >= 1) {
             return true
-        }else{
+        } else {
             return false
         }
     } catch (error) {
@@ -125,7 +135,7 @@ const getConflicts = async (startDate, startTime, endTime, roomNumber) => {
 };
 
 
-const getFreeRooms=async(req,res)=>{
+const getFreeRooms = async (req, res) => {
     try {
         const { startDate, startTime, endTime } = req.body;
         const rooms = await Room.findAll({});
@@ -140,39 +150,43 @@ const getFreeRooms=async(req,res)=>{
         }
 
         res.status(200).json({ rooms: filteredRooms });
-    }  catch (er) {
+    } catch (er) {
         console.log(er);
-        res.status(500).json({message:"Server error!"})
+        res.status(500).json({ message: "Server error!" })
 
     }
 }
 
-const getBookings=async(req,res)=>{
+const getBookings = async (req, res) => {
     try {
-        const userId=req.params.id
-        const bookings=await Booking.findAll({where:{
-            userId:userId
-        }})
+        const userId = req.params.id
+        const bookings = await Booking.findAll({
+            where: {
+                userId: userId
+            }
+        })
 
-        res.status(200).json({bookings:bookings})
+        res.status(200).json({ bookings: bookings })
     } catch (error) {
-        res.status(500).json({message:"Server error!"})
+        res.status(500).json({ message: "Server error!" })
     }
 }
 
-const editBooking=async(req,res)=>{
+const editBooking = async (req, res) => {
     try {
-        const prevBookingId=req.params.id
-        var booking=await Booking.findOne({where:{
-            id:prevBookingId
-        }})
+        const prevBookingId = req.params.id
+        var booking = await Booking.findOne({
+            where: {
+                id: prevBookingId
+            }
+        })
         console.log(booking);
-        booking.roomNumber=req.body.roomNumber
+        booking.roomNumber = req.body.roomNumber
         await booking.save()
-        res.status(200).json({message:"Saved booking",booking:booking})
+        res.status(200).json({ message: "Saved booking", booking: booking })
     } catch (error) {
         console.log(error);
-        res.status(500).json({message:"Server Error!"})
+        res.status(500).json({ message: "Server Error!" })
     }
 }
 
@@ -190,7 +204,16 @@ const deleteBooking = async (req, res) => {
         }
 
         await booking.destroy();
-
+        const guest = await User.findOne({
+            userId: booking.userId,
+        })
+        const fullName = guest.firstName + " " + guest.lastName;
+        const emailCode=guest.email.split("@")[0]
+        const notification = new Notification({
+            content: `${fullName} (${emailCode}) canceled booking of room ${booking.roomNumber} (${booking.startTime} - ${booking.endTime})`,
+            status: false
+        })
+        await notification.save();
         res.status(200).json({ message: `Booking with id ${bookingIdToDelete} has been deleted.` });
     } catch (error) {
         console.error(error);
@@ -215,5 +238,16 @@ const getDayBookings = async (req, res) => {
     }
 };
 
+const getAllBookings = async (req, res) => {
+    try {
+        const bookings = await Booking.findAll({})
+        res.status(200).json({ bookings: bookings });
 
-module.exports ={addBooking,getDayBookings,getFreeRooms,getConflicts,getConflictsReq,getBookings,editBooking,deleteBooking}
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: "Server Error!" });
+    }
+}
+
+
+module.exports = { addBooking, getDayBookings, getFreeRooms, getAllBookings, getConflicts, getConflictsReq, getBookings, editBooking, deleteBooking }

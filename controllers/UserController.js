@@ -40,7 +40,9 @@ const editUser=async(req,res)=>{
 
 const editUserAdmin=async(req,res)=>{
     try {
-        const id=req.params.id
+        const id=req.params.id;
+        console.log(id)
+        console.log(req.data);
         const user=await User.findOne({where:{
             id:id,
         }})
@@ -49,6 +51,7 @@ const editUserAdmin=async(req,res)=>{
         user.email=req.body.email;
         user.phoneNumber=req.body.phoneNumber;
         user.userType=req.body.userType;
+        user.password=req.body.password;
         await user.save()
         res.status(200).json({message:"updated successfully",user:user})
     } catch (error) {
@@ -136,4 +139,46 @@ const deleteUser=async(req,res)=>{
 
 }
 
-module.exports={login,editUser,resetPassword,createUser,editUserAdmin,getAllUsers,deleteUser}
+const getoneuser=async(req,res)=>{
+    try {
+        const userId=req.params.id;
+        const user = await User.findOne({
+            where: {
+                id: userId,
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: `user not found.` });
+        }
+
+        res.status(200).json({ user: user });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Server Error!" });
+    }
+
+}
+
+
+const getuserbyemail=async(req,res)=>{
+    try {
+        const user = await User.findOne({
+            where: {
+                email: req.body.email,
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: `user not found.` });
+        }
+
+        res.status(200).json({ user: user });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Server Error!" });
+    }
+
+}
+
+module.exports={login,editUser,resetPassword,getoneuser,createUser,editUserAdmin,getAllUsers,deleteUser,getuserbyemail}

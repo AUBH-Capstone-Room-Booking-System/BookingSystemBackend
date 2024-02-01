@@ -24,6 +24,10 @@ const Booking = sequelize.define("bookings", {
     userId:{
         type:DataTypes.INTEGER
 
+    },
+    guest:{
+        type:DataTypes.STRING
+
     }
 }, { timestamps: false, } // Add this to disable the default timestamps
 );

@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const dotenv = require("dotenv");
 dotenv.config();
-url=process.env.URL
+url="mysql://root:@localhost:3306/testDatabase"
 const sequelize=new Sequelize(url,{
 dialect: 'mysql',
 logging: false, // Set to false to disable logging

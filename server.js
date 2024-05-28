@@ -46,12 +46,13 @@ app.get("/*", function(req, res){
         }
       );
   
-  })
+  }) 
 
-  app.listen(port, (er) => {
+  app.listen(6005, (er) => {
     if (er) {
     console.log(err);
     } else {
     console.log(`server is running on port ${port}`);
+    console.log(buildPath);
     }
     });
